@@ -19,5 +19,26 @@ def test_login_page(page):
     page.goto(Base_URL)
     close_popups(page)
 
-    logger.info("我正在睡覺")
+    # 登入前的 Token
+    token_before = page.evaluate("() => localStorage.getItem('token')")
+    assert token_before is None
+
+    # 帶入正確的帳密
+    email = "admin@juice-sh.op"
+    password = "admin123"
+
+    email_input = page.locator("#email")
+    email_input.fill(email)
+    
+    password_input = page.locator("#password")
+    password_input.fill(password)
+
+    login_button = page.locator("#loginButton")
+    login_button.click()
+
+    token_after = page.evaluate("() => localStorage.getItem('token')")
+    assert token_after is not None, "登入後應該要有 Token, 但卻沒有!"
+    
+
+    
     
