@@ -1,4 +1,4 @@
-# Juice Shop UI & API 自動化測試
+# Juice Shop UI 自動化測試
 
 ## 簡介
 使用 Playwright + pytest 對 OWASP Juice Shop 進行自動化測試
