@@ -7,6 +7,14 @@ from conftest import close_popups
 logger = logging.getLogger(__name__)
 Base_URL = "http://localhost:3000/#/login"
 
+
+# 帳密
+CORRECT_EMAIL = "admin@juice-sh.op"
+CORRECT_PASSWORD = "admin123"
+WRONG_EMAIL = "wrong@email.com"
+WRONG_PASSWORD = "wrongpassword"
+
+# Helper Function
 def get_login_elements(page):
     return {
 
@@ -36,11 +44,9 @@ def test_login_success(page):
 
     # 正確的帳號密碼
     elements = get_login_elements(page)
-    email = "admin@juice-sh.op"
-    password = "admin123"
 
-    elements['email_input'].fill(email)
-    elements['password_input'].fill(password)
+    elements['email_input'].fill(CORRECT_EMAIL)
+    elements['password_input'].fill(CORRECT_PASSWORD)
     elements['login_button'].click()
 
     token_after = page.evaluate("() => localStorage.getItem('token')")
@@ -57,9 +63,23 @@ def test_login_wrong_password(page):
     page.goto(Base_URL)
     close_popups(page)
 
+    elements = get_login_elements(page)
+
+    # 確認剛進頁面的情況下, 是否log in button是無法點選的
+    assert elements['login_button'].is_disabled(), "帳密空白時, Log in 按鈕應為 disabled !"
+    logger.info("【SUCCESS】Log in 按鈕已確認為 disabled, 無法點擊!")
     
+    # 輸入錯誤帳號密碼
+    elements['email_input'].fill(WRONG_EMAIL)
+    elements['password_input'].fill(WRONG_PASSWORD)
+    elements['login_button'].click()
 
-
+    invalid_message = page.locator(".error")
+    
+    invalid_message.wait_for(state='visible', timeout=5000)
+    print(invalid_message.inner_text())
+    assert invalid_message.is_visible(), "應該要出現Invalid messages 卻沒有!"
+    logger.info("【SUCCESS】確認有出現Invalid messages!")
 
 
     
