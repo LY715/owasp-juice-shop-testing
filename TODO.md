@@ -11,7 +11,7 @@
 | test_login.py | test_login_success | ✅ |
 | test_login.py | test_login_wrong_password | ✅ |
 | test_login.py | test_password_plaintext | ✅ |
-| test_login.py | test_login_invalid_email | ⬜ |
+| test_login.py | test_login_invalid_email | ✅ |
 | test_login.py | test_login_sql_injection | ⬜ |
 |---|---|---|
 | test_cart.py | test_add_item_to_cart | ⬜ |

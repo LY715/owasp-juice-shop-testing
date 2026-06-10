@@ -28,6 +28,8 @@ def get_login_elements(page):
 
     }
 
+def random_password():
+    return ''.join(random.choices(string.ascii_letters + string.digits, k=10))
 
 
 def test_login_success(page):
@@ -91,7 +93,7 @@ def test_password_plaintext(page):
 
     password_collections = []
     for i in range(5):
-        password = ''.join(random.choices(string.ascii_letters + string.digits, k=10))
+        password = random_password()
         password_collections.append(password)
 
 
@@ -119,7 +121,7 @@ def test_password_plaintext(page):
             logger.info("Password is not transmitted in plaintext")
     
     
-def test_invalid_email(page):
+def test_login_invalid_email(page):
     
     invalid_email = "admin#juice-sh.op"
 
@@ -129,10 +131,33 @@ def test_invalid_email(page):
     elements = get_login_elements(page)
 
     elements['email_input'].fill(invalid_email)
-    elements['password_input'].fill(''.join(random.choices(string.ascii_letters + string.digits, k=10)))
+    elements['password_input'].fill(random_password())
     
     
     if elements['login_button'].is_disabled():
         logger.info("Login button is disabled for invalid email format - Frontend validation is working")
     else:
         logger.warning("Login button is not disabled for invalid email format - Frontend validation is not working")
+
+
+
+def test_login_sql_injection(page):
+
+    page.goto(Base_URL)
+    close_popups(page)
+
+    sqlInjection = "' OR 1=1--"
+
+    elements = get_login_elements(page)
+
+    elements['email_input'].fill(sqlInjection)
+    elements['password_input'].fill(random_password())
+    elements['login_button'].click()
+
+    token = page.evaluate("() => localStorage.getItem('token')")
+    
+    if token is not None:
+        logger.warning("SQL Injection succeeded! Vulnerability detected!")
+    else:
+        logger.info("SQL Injection failed!")
+    
