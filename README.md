@@ -33,10 +33,8 @@ pytest --html=report.html --self-contained-html -v --log-cli-level=INFO --log-le
 - test_login.py：登入功能測試
 
 ## 查看報告
-```
-python -m http.server 8080
-```
-打開瀏覽器到 http://localhost:8080/report.html
+
+打開瀏覽器到 https://ly715.github.io/owasp-juice-shop-testing/report.html
 
 ## 測試時發現（Findings During Testing）
 
