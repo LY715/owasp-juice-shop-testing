@@ -42,3 +42,4 @@ python -m http.server 8080
 | 項目 | 說明 | 重現步驟 | 預期結果 | 實際結果 | 嚴重程度 |
 |---|---|---|---|---|---|
 | 密碼明文傳輸 | 登入時密碼以明文方式傳送，未進行前端加密處理 | 1. 打開 F12 → Network tab 2. 輸入帳密點擊 Log in 3. 查看 Request Payload | 密碼應經過加密後再傳輸 | 密碼以plain text直接傳送 | 高 |
+| 前端未驗證 Email 格式 | 輸入不合規的Email格式, 如 admin#juice-sh.op 可以直接送出log in請求並未被擋下 | 1. 在Email欄位輸入 admin#juice-sh.op 2. 輸入任意密碼 3. 點擊Log in | 網頁上應顯示此為不合法的Email格式，因此無法點擊 Log in按鈕 | 無任何警語出現，可以點擊Log in按鈕 | 低 |

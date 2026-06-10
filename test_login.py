@@ -97,23 +97,30 @@ def test_password_plaintext(page):
         password = ''.join(random.choices(string.ascii_letters + string.digits, k=10))
         password_collections.append(password)
 
-    request_data = []
-    page.on("request", lambda request: request_data.append(request))
+
 
     for wrong_password in password_collections:
+        
+        request_data = []
+        page.on("request", lambda request: request_data.append(request))
+
         elements['email_input'].fill(WRONG_EMAIL)
         elements['password_input'].fill(wrong_password)
         elements['login_button'].click()
 
+        plaintext_password = None
+
         for request in request_data:
             if "login" in request.url and request.method == "POST":
                 post_data = request.post_data
-                plantext_password = json.loads(post_data)["password"]
-
-        if plantext_password == wrong_password:
+                plaintext_password = json.loads(post_data)["password"]
+        
+        if plaintext_password is None:
+            logger.warning("【WARNING】找不到登入的 POST 請求！")
+        elif plaintext_password == wrong_password:
             logger.warning(f"【WARNING】密碼以明文傳輸！發現資安漏洞！ Password: {wrong_password}")
         else:
             logger.info("【SUCCESS】密碼沒有以明文傳輸")
     
-    time.sleep(10)
+    
     
