@@ -33,14 +33,11 @@ def get_login_elements(page):
 def test_login_success(page):
     
     """
-    帶入正確的帳密以及密碼-> Click Log in
+    帶入正確的帳密以及密碼-> Click Log in -> 輸出結果需要確認是否有出現Token -> 若有, 視為正確登入; 若無則視為登入失敗
     """
 
-    # Arrange - 關閉popup，準備好頁面
     page.goto(Base_URL)
     close_popups(page)
-
-    # 帶入正確的帳密, 輸出結果需要確認是否有出現Token
     
     # 尚未登入前, 確認是否有無Token存在
     token_before = page.evaluate("() => localStorage.getItem('token')")
@@ -98,7 +95,6 @@ def test_password_plaintext(page):
         password_collections.append(password)
 
 
-
     for wrong_password in password_collections:
         
         request_data = []
@@ -123,4 +119,20 @@ def test_password_plaintext(page):
             logger.info("Password is not transmitted in plaintext")
     
     
+def test_invalid_email(page):
     
+    invalid_email = "admin#juice-sh.op"
+
+    page.goto(Base_URL)
+    close_popups(page)
+    
+    elements = get_login_elements(page)
+
+    elements['email_input'].fill(invalid_email)
+    elements['password_input'].fill(''.join(random.choices(string.ascii_letters + string.digits, k=10)))
+    
+    
+    if elements['login_button'].is_disabled():
+        logger.info("Login button is disabled for invalid email format - Frontend validation is working")
+    else:
+        logger.warning("Login button is not disabled for invalid email format - Frontend validation is not working")
