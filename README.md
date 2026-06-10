@@ -36,3 +36,9 @@ pytest --html=report.html --self-contained-html -v --log-cli-level=INFO --log-le
 python -m http.server 8080
 ```
 打開瀏覽器到 http://localhost:8080/report.html
+
+## 測試時發現（Findings During Testing）
+
+| 項目 | 說明 | 重現步驟 | 預期結果 | 實際結果 | 嚴重程度 |
+|---|---|---|---|---|---|
+| 密碼明文傳輸 | 登入時密碼以明文方式傳送，未進行前端加密處理 | 1. 打開 F12 → Network tab 2. 輸入帳密點擊 Log in 3. 查看 Request Payload | 密碼應經過加密後再傳輸 | 密碼以plain text直接傳送 | 高 |

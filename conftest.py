@@ -9,13 +9,13 @@ def close_popups(page):
     dismiss_welcome = page.locator('button[aria-label="Close Welcome Banner"]')
     if dismiss_welcome.is_visible():
         dismiss_welcome.click()
-        logger.info("【SUCCESS】Welcome popup closed！")
+        #logger.info("【SUCCESS】Welcome popup closed！")
 
     # 關閉 Cookie popup
     cookie_button = page.locator('text=Me want it!')
     cookie_button.wait_for(state="visible", timeout=5000)
     cookie_button.click()
-    logger.info("【SUCCESS】Cookie popup closed！")
+    #logger.info("【SUCCESS】Cookie popup closed！")
 
 @pytest.fixture(scope="function")
 def page():
@@ -24,5 +24,6 @@ def page():
         browser = p.chromium.launch(headless=False, slow_mo=500)
         page = browser.new_page()
         yield page
+        
         browser.close()
         
