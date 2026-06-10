@@ -9,6 +9,7 @@
 - pytest
 - playwright
 - pytest-html
+- Git
 
 ## 啟動 Juice Shop（Docker）
 ```
