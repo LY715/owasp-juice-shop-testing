@@ -44,7 +44,7 @@ def test_login_success(page):
     
     # 尚未登入前, 確認是否有無Token存在
     token_before = page.evaluate("() => localStorage.getItem('token')")
-    assert token_before is None, "登入前不應該出現Token"
+    assert token_before is None, "Token should not exist before login"
 
     # 正確的帳號密碼
     elements = get_login_elements(page)
@@ -54,8 +54,8 @@ def test_login_success(page):
     elements['login_button'].click()
 
     token_after = page.evaluate("() => localStorage.getItem('token')")
-    assert token_after is not None, "登入後應該要有 Token, 但卻沒有!"
-    logger.info(f"【SUCCESS】Token 長度：{len(token_after)}")
+    assert token_after is not None, "Token should exist after login, but it was not found"
+    logger.info(f"Length of Token：{len(token_after)}")
     
 
 def test_login_wrong_password(page):
@@ -70,8 +70,8 @@ def test_login_wrong_password(page):
     elements = get_login_elements(page)
 
     # 確認剛進頁面的情況下, 是否log in button是無法點選的
-    assert elements['login_button'].is_disabled(), "帳密空白時, Log in 按鈕應為 disabled !"
-    logger.info("【SUCCESS】Log in 按鈕已確認為 disabled, 無法點擊!")
+    assert elements['login_button'].is_disabled(), "Login button should be disabled when email and password are empty"
+    logger.info("Login button is confirmed disabled and cannot be clicked")
     
     # 輸入錯誤帳號密碼
     elements['email_input'].fill(WRONG_EMAIL)
@@ -82,8 +82,8 @@ def test_login_wrong_password(page):
     
     invalid_message.wait_for(state='visible', timeout=5000)
     print(invalid_message.inner_text())
-    assert invalid_message.is_visible(), "應該要出現Invalid messages 卻沒有!"
-    logger.info("【SUCCESS】確認有出現Invalid messages!")
+    assert invalid_message.is_visible(), "Invalid message should appear but was not found"
+    logger.info("Invalid message is confirmed visible")
 
 
 def test_password_plaintext(page):
@@ -116,11 +116,11 @@ def test_password_plaintext(page):
                 plaintext_password = json.loads(post_data)["password"]
         
         if plaintext_password is None:
-            logger.warning("【WARNING】找不到登入的 POST 請求！")
+            logger.warning("Log in Post request not found")
         elif plaintext_password == wrong_password:
-            logger.warning(f"【WARNING】密碼以明文傳輸！發現資安漏洞！ Password: {wrong_password}")
+            logger.warning(f"Password is transmitted in plaintext！ Password: {wrong_password}")
         else:
-            logger.info("【SUCCESS】密碼沒有以明文傳輸")
+            logger.info("Password is not transmitted in plaintext")
     
     
     
