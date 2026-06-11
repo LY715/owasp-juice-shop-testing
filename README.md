@@ -36,7 +36,7 @@ pytest --html=report.html --self-contained-html -v --log-cli-level=INFO --log-le
 
 打開瀏覽器到 https://ly715.github.io/owasp-juice-shop-testing/report.html
 
-## 測試時發現（Findings During Testing）
+## Findings During Testing
 
 | 項目 | 說明 | 重現步驟 | 預期結果 | 實際結果 | 嚴重程度 |
 |---|---|---|---|---|---|
