@@ -4,9 +4,9 @@
 |---|---|---|
 | test_ui.py | test_empty_string | ✅ |
 | test_ui.py | test_search_juice | ✅ |
-| test_ui.py | test_search_case_insensitive | ⬜ |
-| test_ui.py | test_search_special_characters | ⬜ |
-| test_ui.py | test_search_trim | ⬜ |
+| test_ui.py | test_search_case_insensitive | ✅ |
+| test_ui.py | test_search_special_characters | ✅ |
+| test_ui.py | test_search_trim | ✅ |
 |---|---|---|
 | test_login.py | test_login_success | ✅ |
 | test_login.py | test_login_wrong_password | ✅ |

@@ -37,11 +37,11 @@ def test_empty_string():
         total_quantities = before_searching.split(" ")[-1]
         print(total_quantities)
 
-        # 點擊搜尋放大鏡圖示
+        # Click on search button
         page.get_by_role("button").filter(has=page.locator("mat-icon:has-text('search')")).click()
         logger.info("Clicked search button！")
 
-        # 點擊搜尋放大鏡後按下 Enter
+        # Search
         search_input = page.locator("div.search-container input")
         search_input.wait_for(state="visible", timeout=5000)
         search_input.press("Enter")
@@ -50,7 +50,6 @@ def test_empty_string():
         after_total_quantities = after_searching.split(" ")[-1]
         
         assert total_quantities == after_total_quantities, "Search results after empty string search does not match the original quantity!"
-        logger.info(f"Empty string search shows the same number of products as before searching:\n Before searching -> {total_quantities} \n After searching -> {after_total_quantities}）！")
 
 
 def test_search_juice(page):
@@ -63,16 +62,11 @@ def test_search_juice(page):
 
     # Search for juice
     page.get_by_role("button").filter(has=page.locator("mat-icon:has-text('search')")).click()
-
-    search_input = page.locator("div.search-container input")
-    search_input.wait_for(state="visible", timeout=5000)
-    search_input.fill("juice")
-    search_input.press("Enter")
+    search_keywords(page, 'juice')
 
 
-    # 驗證畫面上是不是只剩下 juice 相關字眼的商品
-    product_title = page.locator('text=Apple Juice (1000ml)')
-    assert product_title.is_visible(), "Apple Juice not found in search results！"
+    product_title = page.locator('div.name').first.inner_text()
+    assert 'juice' in product_title.lower(), "Apple Juice not found in search results！"
     logger.info("Apple Juice is visible in search results！")
 
     all_products = []
@@ -84,21 +78,18 @@ def test_search_juice(page):
         if next_page_button.is_disabled():
             break
         next_page_button.click()
-        page.wait_for_timeout(5000)
+        page.wait_for_selector("div.name")
 
     logger.info(f"Search results : {all_products}, Total: {len(all_products)} items")
     
 
-    # 確認是否每個商品名稱都包含 "juice"
+    # Verify all search results are juice related
     failed_titles = []
     for title in all_products:
         if "juice" not in title.lower():
             failed_titles.append(title)
     
-    if len(failed_titles) > 0:
-        logger.warning(f"Found {len(failed_titles)} non juice products：{failed_titles}")
-    else:
-        logger.info("Search results are relevant to 'juice'！")
+    assert len(failed_titles) == 0, f"Found {len(failed_titles)} non juice products: {failed_titles}"
 
 
     
