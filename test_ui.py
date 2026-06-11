@@ -3,6 +3,7 @@ import time
 from conftest import close_popups
 from playwright.sync_api import sync_playwright
 import random
+import string
 
 #Logger for recording test logs
 logger = logging.getLogger(__name__)
@@ -105,21 +106,28 @@ def test_search_case_insensitive(page):
     
     page.goto(Base_URL)
     close_popups(page)
-
+    page.get_by_role("button").filter(has=page.locator("mat-icon:has-text('search')")).click()
     
     keywords = ['juice', 'JUICE', ''.join(random.choice([c.lower(), c.upper()]) for c in 'juice')]
 
-    page.get_by_role("button").filter(has=page.locator("mat-icon:has-text('search')")).click()
-
-    all_product_titles = []
+    product_quantities = []
     for keyword in keywords:
         search_keywords(page, keyword)
         count = page.locator(".mat-mdc-paginator-range-label").inner_text().split(" ")[-1]
-        all_product_titles.append(count)
+        product_quantities.append(count)
 
-    assert all_product_titles[0] == all_product_titles[1] == all_product_titles[2]
+    assert product_quantities[0] == product_quantities[1] == product_quantities[2]
         
 
+def test_search_special_characters(page):
+    
+    page.goto(Base_URL)
+    close_popups(page)
+    page.get_by_role("button").filter(has=page.locator("mat-icon:has-text('search')")).click()
+    
+    keywords = ["<script>test</script>","' OR 1=1--", ''.join(random.choices(string.punctuation, k=10))]
 
+    for keyword in keywords:
+        search_keywords(page, keyword)
+        assert page.locator("span:has-text('Search Results')").is_visible(), f"Page crashed after input: {keyword}"
 
-        
