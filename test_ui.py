@@ -131,3 +131,21 @@ def test_search_special_characters(page):
         search_keywords(page, keyword)
         assert page.locator("span:has-text('Search Results')").is_visible(), f"Page crashed after input: {keyword}"
 
+
+def test_search_trim(page):
+
+    """Test for trim in the front and back"""
+    
+    page.goto(Base_URL)
+    close_popups(page)
+    page.get_by_role("button").filter(has=page.locator("mat-icon:has-text('search')")).click()
+
+    product_quantities = []
+    keywords = [" juice", "juice ", " juice "]
+    for keyword in keywords:
+        search_keywords(page, keyword)
+        count = page.locator(".mat-mdc-paginator-range-label").inner_text().split(" ")[-1]
+        product_quantities.append(count)
+
+    assert product_quantities[0] == product_quantities[1] == product_quantities[2], "Trim is not working, search results are different"
+
