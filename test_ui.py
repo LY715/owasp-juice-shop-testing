@@ -2,11 +2,21 @@ import logging
 import time
 from conftest import close_popups
 from playwright.sync_api import sync_playwright
+import random
 
 #Logger for recording test logs
 logger = logging.getLogger(__name__)
 
 Base_URL = "http://localhost:3000"
+
+
+def search_keywords(page, keyword):
+
+    search_input = page.locator("div.search-container input")
+    search_input.wait_for(state="visible", timeout=5000)
+    search_input.fill("")
+    search_input.fill(keyword)
+    search_input.press("Enter")
 
 def test_empty_string():
     
@@ -50,16 +60,13 @@ def test_search_juice(page):
     page.goto(Base_URL)
     close_popups(page)
 
-    # 點擊搜尋
+    # Search for juice
     page.get_by_role("button").filter(has=page.locator("mat-icon:has-text('search')")).click()
-    logger.info("Clicked search button！")
 
-    # 點擊搜尋放大鏡後在搜尋輸入框內輸入 juice 並按下 Enter
     search_input = page.locator("div.search-container input")
     search_input.wait_for(state="visible", timeout=5000)
     search_input.fill("juice")
     search_input.press("Enter")
-    logger.info("Successfully searched juice！")
 
 
     # 驗證畫面上是不是只剩下 juice 相關字眼的商品
@@ -94,7 +101,24 @@ def test_search_juice(page):
 
 
     
+def test_search_case_insensitive(page):
     
+    page.goto(Base_URL)
+    close_popups(page)
+
+    
+    keywords = ['juice', 'JUICE', ''.join(random.choice([c.lower(), c.upper()]) for c in 'juice')]
+
+    page.get_by_role("button").filter(has=page.locator("mat-icon:has-text('search')")).click()
+
+    all_product_titles = []
+    for keyword in keywords:
+        search_keywords(page, keyword)
+        count = page.locator(".mat-mdc-paginator-range-label").inner_text().split(" ")[-1]
+        all_product_titles.append(count)
+
+    assert all_product_titles[0] == all_product_titles[1] == all_product_titles[2]
+        
 
 
 
