@@ -20,7 +20,7 @@ def random_password():
     return ''.join(random.choices(string.ascii_letters + string.digits, k=10))
 
 
-def test_login_success(page):
+def test_login_success(page, login_page):
     
     """
     帶入正確的帳密以及密碼-> Click Log in -> 輸出結果需要確認是否有出現Token -> 若有, 視為正確登入; 若無則視為登入失敗
@@ -34,7 +34,6 @@ def test_login_success(page):
     assert token_before is None, "Token should not exist before login"
 
     # 正確的帳號密碼
-    login_page = LoginPage(page)
     login_page.login(CORRECT_EMAIL, CORRECT_PASSWORD)
 
     token_after = page.evaluate("() => localStorage.getItem('token')")
@@ -42,7 +41,7 @@ def test_login_success(page):
     logger.info(f"Length of Token：{len(token_after)}")
     
 
-def test_login_wrong_password(page):
+def test_login_wrong_password(page, login_page):
 
     """
     帶入錯誤的帳密, 以及測試空值
@@ -51,7 +50,6 @@ def test_login_wrong_password(page):
     page.goto(Base_URL)
     close_popups(page)
 
-    login_page = LoginPage(page)
     
     # log in button是無法點選的
     assert login_page.login_button.is_disabled(), "Login button should be disabled when email and password are empty"
@@ -68,11 +66,10 @@ def test_login_wrong_password(page):
     logger.info("Invalid message is confirmed visible")
 
 
-def test_password_plaintext(page):
+def test_password_plaintext(page, login_page):
 
     page.goto(Base_URL)
     close_popups(page)
-    login_page = LoginPage(page)
 
     password_collections = []
     for i in range(5):
@@ -102,15 +99,13 @@ def test_password_plaintext(page):
             logger.info("Password is not transmitted in plaintext")
     
     
-def test_login_invalid_email(page):
+def test_login_invalid_email(page, login_page):
     
     invalid_email = "admin#juice-sh.op"
 
     page.goto(Base_URL)
     close_popups(page)
     
-    login_page = LoginPage(page)
-
     login_page.email.fill(invalid_email)
     login_page.password.fill(random_password())
     
@@ -119,14 +114,12 @@ def test_login_invalid_email(page):
 
 
 
-def test_login_sql_injection(page):
+def test_login_sql_injection(page, login_page):
 
     page.goto(Base_URL)
     close_popups(page)
 
     sqlInjection = "' OR 1=1--"
-
-    login_page = LoginPage(page)
 
     login_page.login(sqlInjection, random_password())
 

@@ -1,23 +1,13 @@
 import logging
-import time
-from conftest import close_popups
-from playwright.sync_api import sync_playwright
 import random
 import string
+from conftest import close_popups
+from playwright.sync_api import sync_playwright
 
-#Logger for recording test logs
 logger = logging.getLogger(__name__)
 
 Base_URL = "http://localhost:3000"
 
-
-def search_keywords(page, keyword):
-
-    search_input = page.locator("div.search-container input")
-    search_input.wait_for(state="visible", timeout=5000)
-    search_input.fill("")
-    search_input.fill(keyword)
-    search_input.press("Enter")
 
 def test_empty_string():
     
@@ -52,17 +42,17 @@ def test_empty_string():
         assert total_quantities == after_total_quantities, "Search results after empty string search does not match the original quantity!"
 
 
-def test_search_juice(page):
+def test_search_juice(page, search_page):
     """
     測試：Click search on the top right -> Input "juice" -> Validate the result of searching
     """
 
     page.goto(Base_URL)
     close_popups(page)
-
+    
     # Search for juice
-    page.get_by_role("button").filter(has=page.locator("mat-icon:has-text('search')")).click()
-    search_keywords(page, 'juice')
+    search_page.open_search()
+    search_page.search("juice")
 
 
     product_title = page.locator('div.name').first.inner_text()
@@ -93,48 +83,48 @@ def test_search_juice(page):
 
 
     
-def test_search_case_insensitive(page):
+def test_search_case_insensitive(page, search_page):
     
     page.goto(Base_URL)
     close_popups(page)
-    page.get_by_role("button").filter(has=page.locator("mat-icon:has-text('search')")).click()
+    search_page.open_search()
     
     keywords = ['juice', 'JUICE', ''.join(random.choice([c.lower(), c.upper()]) for c in 'juice')]
 
     product_quantities = []
     for keyword in keywords:
-        search_keywords(page, keyword)
+        search_page.search(keyword)
         count = page.locator(".mat-mdc-paginator-range-label").inner_text().split(" ")[-1]
         product_quantities.append(count)
 
     assert product_quantities[0] == product_quantities[1] == product_quantities[2]
         
 
-def test_search_special_characters(page):
+def test_search_special_characters(page, search_page):
     
     page.goto(Base_URL)
     close_popups(page)
-    page.get_by_role("button").filter(has=page.locator("mat-icon:has-text('search')")).click()
+    search_page.open_search()
     
     keywords = ["<script>test</script>","' OR 1=1--", ''.join(random.choices(string.punctuation, k=10))]
 
     for keyword in keywords:
-        search_keywords(page, keyword)
+        search_page.search(keyword)
         assert page.locator("span:has-text('Search Results')").is_visible(), f"Page crashed after input: {keyword}"
 
 
-def test_search_trim(page):
+def test_search_trim(page, search_page):
 
     """Test for trim in the front and back"""
     
     page.goto(Base_URL)
     close_popups(page)
-    page.get_by_role("button").filter(has=page.locator("mat-icon:has-text('search')")).click()
+    search_page.open_search()
 
     product_quantities = []
     keywords = [" juice", "juice ", " juice "]
     for keyword in keywords:
-        search_keywords(page, keyword)
+        search_page.search(keyword)
         count = page.locator(".mat-mdc-paginator-range-label").inner_text().split(" ")[-1]
         product_quantities.append(count)
 
