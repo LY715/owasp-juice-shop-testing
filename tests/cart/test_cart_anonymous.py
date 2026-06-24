@@ -3,6 +3,7 @@ import pytest
 from conftest import close_popups
 import time
 
+pytestmark = pytest.mark.anonymous
 
 Base_URL = "http://localhost:3000"
 
@@ -18,7 +19,6 @@ def test_add_item_to_cart(page):
 
     assert int(after) > int(before), "Cart count did not increase after adding item"
     
-
 def test_add_all_item_to_cart(page):
     
     page.goto(Base_URL)
@@ -43,6 +43,7 @@ def test_add_all_item_to_cart(page):
     total_quantities = int(page.locator('.fa-layers-counter').inner_text())
 
     assert total_quantities == total_buttons, "Cart count did not increase after adding item"
+
 
 def test_random_cart_item_count(page):
 
@@ -108,4 +109,47 @@ def test_remove_item_from_cart(page):
     assert result == basket_result, "Remove action not work!"
 
 
+def test_update_item_quantity(page):
+
+    page.goto(Base_URL)
+    close_popups(page)
+
+    buttons = page.locator('button[aria-label="Add to Basket"]')
+    for i in range(0, 3):
+        buttons.nth(i).click()
+        buttons.nth(i).click()
+    
+    after_added = int(page.locator('.fa-layers-counter').inner_text())
+
+    page.locator('button[aria-label="Show the shopping cart"]').click()
+    
+    # minus button
+    minus_button = page.locator('button:has(svg.fa-minus-square)')
+
+    minus_total = 0
+    for i in range(0, 3):
+        minus_total += i
+        minus_button.nth(i).click()
+
+    after_minus = after_added - minus_total
+
+    assert after_minus == int(page.locator('.fa-layers-counter').inner_text())
+
+
+def test_checkout_without_login(page):
+    
+    page.goto(Base_URL)
+    close_popups(page)
+
+    buttons = page.locator('button[aria-label="Add to Basket"]')
+    for i in range(0, 3):
+        buttons.nth(i).click()
+        buttons.nth(i).click()
+
+    page.locator('button[aria-label="Show the shopping cart"]').click()
+    
+    page.locator('#checkoutButton').click()
+    page.wait_for_url("**/login**")
+
+    assert 'login' in page.url, "Checkout should redirect to login page when not authenticated"
     
